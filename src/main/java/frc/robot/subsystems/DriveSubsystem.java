@@ -61,7 +61,12 @@ public class DriveSubsystem extends SubsystemBase {
 
   private Field2d field = new Field2d();
 
+  boolean forward; 
+  boolean backward;
+  boolean left;
+  boolean right;
 
+  float movementSpeed = 1; //scaled between 0-1 and multiplied by -1/1 in movement handlers
   @Override
   public void simulationPeriodic() {
       drivetrainSim.setInputs(leftMotor.get() * RobotController.getInputVoltage(), rightMotor.get() * RobotController.getInputVoltage());
@@ -80,42 +85,114 @@ public class DriveSubsystem extends SubsystemBase {
                     leftEncoderSim.getDistance(),
                     rightEncoderSim.getDistance());
     field.setRobotPose(m_odometry.getPoseMeters());
-     
+     if (forward){
+      forwardMove();
+     }
+     if (backward)
+     {
+       backwardMove();;
+     }
+     if(left)
+     {
+       leftTurn();
+     }
+     if(right)
+     {
+       rightTurn();
+     }
+  }
+  void movementChanges(int type, boolean set)
+  {
+    if(type == 1)
+    {
+      forward = set;
+    }
+    if(type == 2)
+    {
+      backward = set;
+    }
+    if(type == 3)
+    {
+      left = set;
+    }
+    if(type == 4)
+    {
+      right = set;
+    }
+
   }
 
   public void forwardMove()
   {
-    m_diffDrive.arcadeDrive(1, 0);
+    m_diffDrive.arcadeDrive(1 * movementSpeed, 0);
   }
 
-  public InstantCommand fwrdCmd() {
-    return new InstantCommand(() -> forwardMove());
+  public InstantCommand forwardSet() {
+    return new InstantCommand(() -> movementChanges(1, true));
+  }
+
+  public InstantCommand forwardReset() {
+    return new InstantCommand(() -> movementChanges(1, false));
   }
 
   public void backwardMove()
   {
-    m_diffDrive.arcadeDrive(-1, 0);
+    m_diffDrive.arcadeDrive(-1 * movementSpeed, 0);
   }
 
-  public InstantCommand bwrdCmd() {
-    return new InstantCommand(() -> backwardMove());
+  public InstantCommand backwardSet() {
+    return new InstantCommand(() -> movementChanges(2, true));
+  }
+
+  public InstantCommand backwardReset() {
+    return new InstantCommand(() -> movementChanges(2, false));
   }
 
   public void leftTurn()
   {
-    m_diffDrive.arcadeDrive(0, 1);
+    m_diffDrive.arcadeDrive(0, -.5);
   }
 
-  public InstantCommand leftCmd() {
-    return new InstantCommand(() -> leftTurn());
+  public InstantCommand leftSet() {
+    return new InstantCommand(() -> movementChanges(3, true));
   }
+
+  public InstantCommand leftReset() {
+    return new InstantCommand(() -> movementChanges(3, false));
+  }
+
 
   public void rightTurn()
   {
-    m_diffDrive.arcadeDrive(0, -1);
+    m_diffDrive.arcadeDrive(0, .5);
   }
 
-  public InstantCommand rightCmd() {
-    return new InstantCommand(() -> rightTurn());
+  public InstantCommand rightSet() {
+    return new InstantCommand(() -> movementChanges(4, true));
+  }
+
+  public InstantCommand rightReset() {
+    return new InstantCommand(() -> movementChanges(4, false));
+  }
+
+  public void speedHandler(double change)
+  {
+    movementSpeed += change;
+    if(movementSpeed < 0)
+    {movementSpeed = 0;}
+    if(movementSpeed > 1)
+    {movementSpeed = 1;}
+
+    SmartDashboard.putNumber("speed", movementSpeed);
+  }
+
+  public InstantCommand speedUp()
+  {
+    return new InstantCommand(() -> speedHandler(0.25));
+  }
+
+  public InstantCommand speedDown()
+  {
+    return new InstantCommand(() -> speedHandler(-0.25));
   }
 }

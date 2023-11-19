@@ -7,6 +7,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -30,10 +31,27 @@ public class RobotContainer {
   private void configureBindings() {
     //YOUR BINDINGS HERE
 
-    m_driverController.a().onTrue(m_drivetrain.fwrdCmd());
-    m_driverController.b().onTrue(m_drivetrain.bwrdCmd());
-    m_driverController.leftBumper().onTrue(m_drivetrain.leftCmd());
-    m_driverController.rightBumper().onTrue(m_drivetrain.rightCmd());
+    m_driverController.a().onTrue(m_drivetrain.forwardSet());
+    m_driverController.a().onFalse(m_drivetrain.forwardReset());
+    m_driverController.b().onTrue(m_drivetrain.backwardSet());
+    m_driverController.b().onFalse(m_drivetrain.backwardReset());
+    m_driverController.leftBumper().onTrue(m_drivetrain.leftSet());
+    m_driverController.leftBumper().onFalse(m_drivetrain.leftReset());
+    m_driverController.rightBumper().onTrue(m_drivetrain.rightSet());
+    m_driverController.rightBumper().onFalse(m_drivetrain.rightReset());
+
+    m_driverController.x().onTrue(m_drivetrain.speedUp());
+    m_driverController.y().onTrue(m_drivetrain.speedDown());
+
+    m_driverController.leftStick().onTrue(
+      m_drivetrain.forwardSet()
+      .andThen(new WaitCommand(2))
+      .andThen(m_drivetrain.forwardReset())
+      .andThen(new WaitCommand(1))
+      .andThen(m_drivetrain.backwardSet())
+      .andThen(new WaitCommand(2))
+      .andThen(m_drivetrain.backwardReset())
+    );
     //m_driverController.b().whileTrue(m_drivetrain.exampleMethodCommand());
   }
 
