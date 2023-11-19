@@ -30,10 +30,8 @@ public class RobotContainer {
   private void configureBindings() {
     //YOUR BINDINGS HERE
 
-    m_driverController.a().onTrue(m_drivetrain.fwrdCmd());
-    m_driverController.b().onTrue(m_drivetrain.bwrdCmd());
-    m_driverController.leftBumper().onTrue(m_drivetrain.leftCmd());
-    m_driverController.rightBumper().onTrue(m_drivetrain.rightCmd());
+    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
+    // cancelling on release.
     //m_driverController.b().whileTrue(m_drivetrain.exampleMethodCommand());
   }
 
